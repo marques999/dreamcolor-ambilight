@@ -1,12 +1,12 @@
 package dreamcolor
 
 const (
-	SubmodeEnergy   = 0
-	SubmodeSpectrum = 1
-	SubmodeScroll   = 2
-	SubmodeRhythm   = 3
-	SubmodeMild     = 4
-	SubmodeDynamic  = 5
+	submodeEnergy   = 0
+	submodeSpectrum = 1
+	submodeScroll   = 2
+	submodeRhythm   = 3
+	submodeMild     = 4
+	submodeDynamic  = 5
 )
 
 type MusicCommand struct {
@@ -18,33 +18,37 @@ type MusicRgbCommand struct {
 	RgbColor
 }
 
-func BuildMusicCommand(submode int, sensitivity int) *Buffer {
-	return BuildWriteCommand(CommandMode).
-		WriteByte(ModeMusicIc).
-		WriteByte(submode).
-		WriteByte(sensitivity)
+func writeMusic(submode int, sensitivity int) *arrayBuffer {
+	return buildWriteCommand(commandMode).
+		writeByte(modeMusicIc).
+		writeByte(submode).
+		writeByte(sensitivity)
 }
 
-func SetDynamic(parameters MusicCommand) *Buffer {
-	return BuildMusicCommand(SubmodeDynamic, parameters.Sensitivity)
+func SetDynamic(parameters MusicCommand) []byte {
+	return writeMusic(submodeDynamic, parameters.Sensitivity).toByteArray()
 }
 
-func SetEnergy(parameters MusicCommand) *Buffer {
-	return BuildMusicCommand(SubmodeEnergy, parameters.Sensitivity)
+func SetEnergy(parameters MusicCommand) []byte {
+	return writeMusic(submodeEnergy, parameters.Sensitivity).toByteArray()
 }
 
-func SetMild(parameters MusicCommand) *Buffer {
-	return BuildMusicCommand(SubmodeMild, parameters.Sensitivity)
+func SetMild(parameters MusicCommand) []byte {
+	return writeMusic(submodeMild, parameters.Sensitivity).toByteArray()
 }
 
-func SetRhythm(parameters MusicCommand) *Buffer {
-	return BuildMusicCommand(SubmodeRhythm, parameters.Sensitivity)
+func SetRhythm(parameters MusicCommand) []byte {
+	return writeMusic(submodeRhythm, parameters.Sensitivity).toByteArray()
 }
 
-func SetScroll(parameters MusicRgbCommand) *Buffer {
-	return BuildMusicCommand(SubmodeScroll, parameters.Sensitivity).WriteRgb(parameters.RgbColor)
+func SetScroll(parameters MusicRgbCommand) []byte {
+	return writeMusic(submodeScroll, parameters.Sensitivity).
+		writeRgb(parameters.RgbColor).
+		toByteArray()
 }
 
-func SetSpectrum(parameters MusicRgbCommand) *Buffer {
-	return BuildMusicCommand(SubmodeSpectrum, parameters.Sensitivity).WriteRgb(parameters.RgbColor)
+func SetSpectrum(parameters MusicRgbCommand) []byte {
+	return writeMusic(submodeSpectrum, parameters.Sensitivity).
+		writeRgb(parameters.RgbColor).
+		toByteArray()
 }

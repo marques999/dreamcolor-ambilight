@@ -1,16 +1,16 @@
 package dreamcolor
 
 const (
-	ModeVideo      = 0x00
-	ModeMusicIc    = 0x01
-	ModeColor      = 0x02
-	ModeMusic      = 0x03
-	ModeScene      = 0x04
-	ModeMicrophone = 0x05
-	ModeDiySingle  = 0x06
-	ModeStatic7001 = 0x08
-	ModeScene7001  = 0x09
-	ModeDiy        = 0x0A
+	modeVideo      = 0x00
+	modeMusicIc    = 0x01
+	modeColor      = 0x02
+	modeMusic      = 0x03
+	modeScene      = 0x04
+	modeMicrophone = 0x05
+	modeDiySingle  = 0x06
+	modeStatic7001 = 0x08
+	modeScene7001  = 0x09
+	modeDiy        = 0x0A
 )
 
 type ColorCommand struct {
@@ -24,25 +24,30 @@ type MicrophoneCommand struct {
 	Toggle bool
 }
 
-func GetMode() *Buffer {
-	return BuildReadCommand(CommandMode)
+func GetMode() []byte {
+	return buildReadCommand(commandMode).toByteArray()
 }
 
-func SetColor(parameters RgbColor) *Buffer {
-	return BuildWriteCommand(CommandMode).
-		WriteByte(ModeColor).
-		WriteRgb(parameters)
+func SetColor(parameters RgbColor) []byte {
+	return buildWriteCommand(commandMode).
+		writeByte(modeColor).
+		writeRgb(parameters).
+		toByteArray()
 }
 
-func SetColorAlternate(parameters ColorCommand) *Buffer {
-	return SetColor(parameters.ColorA).
-		WriteBoolean(parameters.Toggle).
-		WriteRgb(parameters.ColorB)
+func SetColorAlternate(parameters ColorCommand) []byte {
+	return buildWriteCommand(commandMode).
+		writeByte(modeColor).
+		writeRgb(parameters.ColorA).
+		writeBoolean(parameters.Toggle).
+		writeRgb(parameters.ColorB).
+		toByteArray()
 }
 
-func SetMicrophone(parameters MicrophoneCommand) *Buffer {
-	return BuildWriteCommand(CommandMode).
-		WriteByte(ModeMicrophone).
-		WriteBoolean(parameters.Toggle).
-		WriteRgb(parameters.RgbColor)
+func SetMicrophone(parameters MicrophoneCommand) []byte {
+	return buildWriteCommand(commandMode).
+		writeByte(modeMicrophone).
+		writeBoolean(parameters.Toggle).
+		writeRgb(parameters.RgbColor).
+		toByteArray()
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/paypal/gatt/examples/option"
 )
 
-var done = make(chan struct{})
+var finishTask = make(chan struct{})
 
 func onStateChanged(device gatt.Device, state gatt.State) {
 
@@ -24,7 +24,6 @@ func onStateChanged(device gatt.Device, state gatt.State) {
 
 	switch state {
 	case gatt.StatePoweredOn:
-		log.Println("[onStateChanged] Scanning devices...")
 		device.Scan([]gatt.UUID{}, false)
 		return
 	default:
@@ -73,21 +72,9 @@ func findCharacteristicByType(peripheral gatt.Peripheral, service *gatt.Service,
 	return nil
 }
 
-/**
- *
- */
-
-var opcodeRead = []byte{0xAA}
-var opcodeWrite = []byte{0x33}
-var opcodeWriteFifo = []byte{0xA1}
-
-func write(peripheral gatt.Peripheral, characteristic *gatt.Characteristic, command *dreamcolor.Buffer) error {
-	return peripheral.WriteCharacteristic(characteristic, command.Bytes(), true)
+func write(peripheral gatt.Peripheral, characteristic *gatt.Characteristic, command []byte) error {
+	return peripheral.WriteCharacteristic(characteristic, command, true)
 }
-
-/**
- *
- */
 
 func onPeripheralConnected(peripheral gatt.Peripheral, exception error) {
 
@@ -106,15 +93,15 @@ func onPeripheralConnected(peripheral gatt.Peripheral, exception error) {
 
 	notificationService := findServiceByUUID(peripheral, "000102030405060708090a0b0c0d1910")
 	writeCharacteristic := findCharacteristicByType(peripheral, notificationService, gatt.CharWriteNR)
+
 	//setAmbilight(peripheral, writeCharacteristic)
 
-	command := dreamcolor.SetColorAlternate(dreamcolor.ColorCommand{
-		dreamcolor.RgbColor{255, 0, 0},
-		dreamcolor.RgbColor{0, 255, 255},
-		true,
-	})
-	println(command)
-	write(peripheral, writeCharacteristic, command)
+	write(peripheral, writeCharacteristic, dreamcolor.SetColorAlternate(dreamcolor.ColorCommand{
+		ColorA: dreamcolor.RgbColor{Red: 255, Green: 0, Blue: 0},
+		ColorB: dreamcolor.RgbColor{Red: 0, Green: 255, Blue: 255},
+		Toggle: true,
+	}))
+
 	// for _, service := range services {
 
 	// 	serviceName := service.Name()
@@ -197,7 +184,7 @@ func onPeripheralConnected(peripheral gatt.Peripheral, exception error) {
 func onPeripheralDisconnected(peripheral gatt.Peripheral, exception error) {
 	fmt.Println("onPeripheralDisconnected")
 	//peripheral.Device().Connect(peripheral)
-	close(done)
+	close(finishTask)
 }
 
 func main() {
@@ -221,7 +208,7 @@ func main() {
 	)
 
 	device.Init(onStateChanged)
-	<-done
+	<-finishTask
 	fmt.Println("mainDone")
 }
 
@@ -236,14 +223,20 @@ func processBatch(k int, flags int, screenshot image.Image) prominentcolor.Color
 
 func setAmbilight(peripheral gatt.Peripheral, characteristic *gatt.Characteristic) {
 
-	var previous prominentcolor.ColorRGB
+	var previous dreamcolor.RgbColor
 
 	for {
 		screnshot, _ := screenshot.CaptureRect(screenshot.GetDisplayBounds(0))
-		current := processBatch(1, prominentcolor.ArgumentNoCropping, screnshot)
+		prominent := processBatch(1, prominentcolor.ArgumentNoCropping, screnshot)
+
+		current := dreamcolor.RgbColor{
+			Red:   prominent.R,
+			Green: prominent.G,
+			Blue:  prominent.B,
+		}
 
 		if current != previous {
-			write(peripheral, characteristic, dreamcolor.SetColor(dreamcolor.RgbColor{current.R, current.G, current.B}))
+			write(peripheral, characteristic, dreamcolor.SetColor(current))
 		}
 
 		time.Sleep(100 * time.Millisecond)

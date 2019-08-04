@@ -1,18 +1,25 @@
 package dreamcolor
 
-const (
-	SceneMorning  = 0x00
-	SceneSunset   = 0x01
-	SceneMovie    = 0x02
-	SceneDate     = 0x03
-	SceneRomantic = 0x04
-	SceneBlinking = 0x05
-	SceneCandle   = 0x06
-	SceneSnow     = 0x07
-)
+type Scene int
 
-func SetScene(parameters IntegerCommand) *Buffer {
-	return BuildWriteCommand(CommandMode).
-		WriteByte(ModeScene).
-		WriteByte(parameters.Value)
+var Scenes = &struct {
+	Morning  Scene
+	Sunset   Scene
+	Movie    Scene
+	Date     Scene
+	Romantic Scene
+	Blinking Scene
+	Candle   Scene
+	Snow     Scene
+}{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07}
+
+type SceneCommand struct {
+	Id Scene
+}
+
+func SetScene(parameters SceneCommand) []byte {
+	return buildWriteCommand(commandMode).
+		writeByte(modeScene).
+		writeByte(int(parameters.Id)).
+		toByteArray()
 }

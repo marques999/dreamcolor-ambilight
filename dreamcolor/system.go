@@ -13,32 +13,47 @@ type RedBlueCommand struct {
 	Blue int
 }
 
-func GetBrightness() *Buffer {
-	return BuildReadCommand(CommandBrightness)
+func GetBrightness() []byte {
+	return buildReadCommand(commandBrightness).toByteArray()
 }
 
-func GetEnabled() *Buffer {
-	return BuildReadCommand(CommandSwitch)
+func GetEnabled() []byte {
+	return buildReadCommand(commandSwitch).toByteArray()
 }
 
-func SetBrightness(parameters IntegerCommand) *Buffer {
-	return BuildWriteCommand(CommandBrightness).WriteByte(parameters.Value)
+func GetRedBlue() []byte {
+	return buildReadCommand(commandRedBlue).toByteArray()
 }
 
-func SetCurrent(parameters IntegerCommand) *Buffer {
-	return BuildWriteCommand(CommandCurrent).WriteByte(parameters.Value)
+func GetVersion() []byte {
+	return buildReadCommand(commandVersion).toByteArray()
 }
 
-func SetEnabled(parameters BooleanCommand) *Buffer {
-	return BuildWriteCommand(CommandSwitch).WriteBoolean(parameters.Value)
+func SetBrightness(parameters IntegerCommand) []byte {
+	return buildWriteCommand(commandBrightness).
+		writeByte(parameters.Value).
+		toByteArray()
 }
 
-func SetInitialize() *Buffer {
-	return BuildWriteCommand(CommandInitialize)
+func SetCurrent(parameters IntegerCommand) []byte {
+	return buildWriteCommand(commandCurrent).
+		writeByte(parameters.Value).
+		toByteArray()
 }
 
-func SetRedBlue(parameters RedBlueCommand) *Buffer {
-	return BuildWriteCommand(CommandRedBlue).
-		WriteByte(parameters.Red & 0xFF).
-		WriteByte(parameters.Blue & 0xFF)
+func SetEnabled(parameters BooleanCommand) []byte {
+	return buildWriteCommand(commandSwitch).
+		writeBoolean(parameters.Value).
+		toByteArray()
+}
+
+func SetInitialize() []byte {
+	return buildWriteCommand(commandInitialize).toByteArray()
+}
+
+func SetRedBlue(parameters RedBlueCommand) []byte {
+	return buildWriteCommand(commandRedBlue).
+		writeByte(parameters.Red & 0xFF).
+		writeByte(parameters.Blue & 0xFF).
+		toByteArray()
 }

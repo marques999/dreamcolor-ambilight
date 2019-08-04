@@ -1,11 +1,9 @@
 package dreamcolor
 
-import "encoding/hex"
-
-type Buffer struct {
+type arrayBuffer struct {
+	offset   int
+	capacity int
 	data     []byte
-	Capacity int
-	Offset   int
 }
 
 func calculateXor(parameters []byte) byte {
@@ -16,35 +14,37 @@ func calculateXor(parameters []byte) byte {
 		xorChecksum ^= parameter
 	}
 
-	return byte(xorChecksum & 0xFF)
+	return xorChecksum
 }
 
-func InitializeBuffer(capacity int) *Buffer {
-	return &Buffer{make([]byte, capacity), capacity, 0}
+func initializeBuffer(capacity int) *arrayBuffer {
+	return &arrayBuffer{
+		offset:   0,
+		capacity: capacity,
+		data:     make([]byte, capacity),
+	}
 }
 
-func (writer *Buffer) WriteByte(value int) *Buffer {
+func (writer *arrayBuffer) writeByte(value int) *arrayBuffer {
 
-	writer.data[writer.Offset] = byte(value & 0xFF)
-	writer.Offset++
+	writer.data[writer.offset] = byte(value & 0xFF)
+	writer.offset++
 
 	return writer
 }
 
-func (writer *Buffer) WriteBoolean(value bool) *Buffer {
+func (writer *arrayBuffer) writeBoolean(value bool) *arrayBuffer {
 
 	if value {
-		return writer.WriteByte(0x01)
+		return writer.writeByte(1)
 	}
 
-	return writer.WriteByte(0x00)
+	return writer.writeByte(0)
 }
 
-func (writer *Buffer) Bytes() []byte {
-	writer.data[writer.Capacity-1] = calculateXor(writer.data)
+func (writer *arrayBuffer) toByteArray() []byte {
+
+	writer.data[writer.capacity-1] = calculateXor(writer.data)
+
 	return writer.data
-}
-
-func (writer *Buffer) String() string {
-	return hex.EncodeToString(writer.data)
 }
