@@ -29,7 +29,9 @@ func GetMode() *Buffer {
 }
 
 func SetColor(parameters RgbColor) *Buffer {
-	return BuildWriteCommand(CommandMode).WriteByte(ModeColor)
+	return BuildWriteCommand(CommandMode).
+		WriteByte(ModeColor).
+		WriteRgb(parameters)
 }
 
 func SetColorAlternate(parameters ColorCommand) *Buffer {
