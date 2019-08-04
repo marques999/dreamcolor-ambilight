@@ -14,20 +14,14 @@ const (
 	CommandLength     = 0x14
 )
 
-const (
-	OpcodeRead          = 0xAA
-	OpcodeWrite         = 0x33
-	OpcodeWriteBuffered = 0xA1
-)
-
 func BuildReadCommand(address int) *Buffer {
-	return InitializeBuffer(CommandLength).WriteByte(OpcodeRead).WriteByte(address)
+	return InitializeBuffer(CommandLength).WriteByte(0xAA).WriteByte(address)
 }
 
 func BuildWriteCommand(address int) *Buffer {
-	return InitializeBuffer(CommandLength).WriteByte(OpcodeWrite).WriteByte(address)
+	return InitializeBuffer(CommandLength).WriteByte(0x33).WriteByte(address)
 }
 
 func BuildWriteBufferedCommand(address int) *Buffer {
-	return InitializeBuffer(CommandLength).WriteByte(OpcodeWriteBuffered).WriteByte(address)
+	return InitializeBuffer(CommandLength).WriteByte(0xA1).WriteByte(address)
 }
