@@ -20,14 +20,14 @@ const (
 	OpcodeWriteBuffered = 0xA1
 )
 
-func BuildReadCommand() *Buffer {
-	return InitializeBuffer(CommandLength).WriteByte(OpcodeRead)
+func BuildReadCommand(address int) *Buffer {
+	return InitializeBuffer(CommandLength).WriteByte(OpcodeRead).WriteByte(address)
 }
 
-func BuildWriteCommand() *Buffer {
-	return InitializeBuffer(CommandLength).WriteByte(OpcodeWrite)
+func BuildWriteCommand(address int) *Buffer {
+	return InitializeBuffer(CommandLength).WriteByte(OpcodeWrite).WriteByte(address)
 }
 
-func BuildWriteBufferedCommand(parameters []byte) *Buffer {
-	return InitializeBuffer(CommandLength).WriteByte(OpcodeWriteBuffered)
+func BuildWriteBufferedCommand(address int) *Buffer {
+	return InitializeBuffer(CommandLength).WriteByte(OpcodeWriteBuffered).WriteByte(address)
 }

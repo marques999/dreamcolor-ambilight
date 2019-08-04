@@ -2,17 +2,17 @@ package dreamcolor
 
 import "time"
 
+type DelayCommand struct {
+	Enable  bool
+	Hours   int
+	Minutes int
+}
+
 type TimeCommand struct {
 	Hours     int
 	Minutes   int
 	Seconds   int
 	DayOfWeek time.Weekday
-}
-
-type DelayCommand struct {
-	Enable  bool
-	Hours   int
-	Minutes int
 }
 
 func SyncTime() *Buffer {
@@ -33,18 +33,14 @@ func SyncTime() *Buffer {
 }
 
 func SetDelay(parameters DelayCommand) *Buffer {
-
-	return BuildWriteCommand().
-		WriteByte(CommandDelay).
+	return BuildWriteCommand(CommandDelay).
 		WriteBoolean(parameters.Enable).
 		WriteByte(parameters.Hours).
 		WriteByte(parameters.Minutes)
 }
 
 func SetTime(parameters TimeCommand) *Buffer {
-
-	return BuildWriteCommand().
-		WriteByte(CommandSync).
+	return BuildWriteCommand(CommandSync).
 		WriteByte(parameters.Hours).
 		WriteByte(parameters.Minutes).
 		WriteByte(parameters.Seconds).

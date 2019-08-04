@@ -11,13 +11,8 @@ const (
 	SceneSnow     = 0x07
 )
 
-type SceneCommand struct {
-	ID int
-}
-
-func SetScene(parameters SceneCommand) *Buffer {
-	return BuildWriteCommand().
-		WriteByte(CommandMode).
+func SetScene(parameters IntegerCommand) *Buffer {
+	return BuildWriteCommand(CommandMode).
 		WriteByte(ModeScene).
-		WriteByte(parameters.ID)
+		WriteByte(parameters.Value)
 }

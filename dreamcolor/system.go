@@ -13,35 +13,32 @@ type RedBlueCommand struct {
 	Blue int
 }
 
+func GetBrightness() *Buffer {
+	return BuildReadCommand(CommandBrightness)
+}
+
 func GetEnabled() *Buffer {
-	return BuildReadCommand().WriteByte(CommandSwitch)
+	return BuildReadCommand(CommandSwitch)
 }
 
 func SetBrightness(parameters IntegerCommand) *Buffer {
-	return BuildWriteCommand().
-		WriteByte(CommandBrightness).
-		WriteByte(parameters.Value)
+	return BuildWriteCommand(CommandBrightness).WriteByte(parameters.Value)
 }
 
 func SetCurrent(parameters IntegerCommand) *Buffer {
-	return BuildWriteCommand().
-		WriteByte(CommandCurrent).
-		WriteByte(parameters.Value)
+	return BuildWriteCommand(CommandCurrent).WriteByte(parameters.Value)
 }
 
 func SetEnabled(parameters BooleanCommand) *Buffer {
-	return BuildWriteCommand().
-		WriteByte(CommandSwitch).
-		WriteBoolean(parameters.Value)
+	return BuildWriteCommand(CommandSwitch).WriteBoolean(parameters.Value)
 }
 
 func SetInitialize() *Buffer {
-	return BuildWriteCommand().WriteByte(CommandInitialize)
+	return BuildWriteCommand(CommandInitialize)
 }
 
 func SetRedBlue(parameters RedBlueCommand) *Buffer {
-	return BuildWriteCommand().
-		WriteByte(CommandRedBlue).
+	return BuildWriteCommand(CommandRedBlue).
 		WriteByte(parameters.Red & 0xFF).
 		WriteByte(parameters.Blue & 0xFF)
 }

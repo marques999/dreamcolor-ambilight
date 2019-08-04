@@ -25,11 +25,11 @@ type MicrophoneCommand struct {
 }
 
 func GetMode() *Buffer {
-	return BuildReadCommand().WriteByte(CommandMode)
+	return BuildReadCommand(CommandMode)
 }
 
 func SetColor(parameters RgbColor) *Buffer {
-	return BuildWriteCommand().WriteByte(CommandMode).WriteByte(ModeColor)
+	return BuildWriteCommand(CommandMode).WriteByte(ModeColor)
 }
 
 func SetColorAlternate(parameters ColorCommand) *Buffer {
@@ -39,8 +39,7 @@ func SetColorAlternate(parameters ColorCommand) *Buffer {
 }
 
 func SetMicrophone(parameters MicrophoneCommand) *Buffer {
-	return BuildWriteCommand().
-		WriteByte(CommandMode).
+	return BuildWriteCommand(CommandMode).
 		WriteByte(ModeMicrophone).
 		WriteBoolean(parameters.Toggle).
 		WriteRgb(parameters.RgbColor)

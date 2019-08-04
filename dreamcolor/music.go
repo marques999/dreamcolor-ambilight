@@ -19,8 +19,7 @@ type MusicRgbCommand struct {
 }
 
 func BuildMusicCommand(submode int, sensitivity int) *Buffer {
-	return BuildWriteCommand().
-		WriteByte(CommandMode).
+	return BuildWriteCommand(CommandMode).
 		WriteByte(ModeMusicIc).
 		WriteByte(submode).
 		WriteByte(sensitivity)
