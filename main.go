@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"./dreamcolor"
 	"github.com/EdlinOrg/prominentcolor"
 	"github.com/kbinani/screenshot"
 	"github.com/paypal/gatt"
@@ -80,9 +81,8 @@ var opcodeRead = []byte{0xAA}
 var opcodeWrite = []byte{0x33}
 var opcodeWriteFifo = []byte{0xA1}
 
-func write(peripheral gatt.Peripheral, characteristic *gatt.Characteristic, parameters []byte) error {
-	return peripheral.WriteCharacteristic(characteristic,
-		generateCommand(append(opcodeWrite, parameters...)), true)
+func write(peripheral gatt.Peripheral, characteristic *gatt.Characteristic, command *dreamcolor.Buffer) error {
+	return peripheral.WriteCharacteristic(characteristic, command.Bytes(), true)
 }
 
 /**
@@ -106,7 +106,15 @@ func onPeripheralConnected(peripheral gatt.Peripheral, exception error) {
 
 	notificationService := findServiceByUUID(peripheral, "000102030405060708090a0b0c0d1910")
 	writeCharacteristic := findCharacteristicByType(peripheral, notificationService, gatt.CharWriteNR)
-	setAmbilight(peripheral, writeCharacteristic)
+	//setAmbilight(peripheral, writeCharacteristic)
+
+	command := dreamcolor.SetColorAlternate(dreamcolor.ColorCommand{
+		dreamcolor.RgbColor{255, 0, 0},
+		dreamcolor.RgbColor{0, 255, 255},
+		true,
+	})
+	println(command)
+	write(peripheral, writeCharacteristic, command)
 	// for _, service := range services {
 
 	// 	serviceName := service.Name()
@@ -188,8 +196,8 @@ func onPeripheralConnected(peripheral gatt.Peripheral, exception error) {
 
 func onPeripheralDisconnected(peripheral gatt.Peripheral, exception error) {
 	fmt.Println("onPeripheralDisconnected")
-	peripheral.Device().Connect(peripheral)
-	//close(done)
+	//peripheral.Device().Connect(peripheral)
+	close(done)
 }
 
 func main() {
@@ -235,7 +243,7 @@ func setAmbilight(peripheral gatt.Peripheral, characteristic *gatt.Characteristi
 		current := processBatch(1, prominentcolor.ArgumentNoCropping, screnshot)
 
 		if current != previous {
-			write(peripheral, characteristic, setColor(current.R, current.G, current.B))
+			write(peripheral, characteristic, dreamcolor.SetColor(dreamcolor.RgbColor{current.R, current.G, current.B}))
 		}
 
 		time.Sleep(100 * time.Millisecond)
